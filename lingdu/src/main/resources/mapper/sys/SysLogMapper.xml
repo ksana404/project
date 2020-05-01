@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sb.sys.dao.SysLogDao">
+    <!-- sql元素用于对共性进行提取 -->
+    <!-- 此共性是 对于数据筛选的条件是 根据用户名筛选数据 -->
+    <!-- 这样写的目的是 当有username有值的时候，只使用值去匹配，而没有值的时候，匹配所有 
+    bug: 相同名字也会被匹配到-->
+    <!-- 我也可以另外写一个方法进行判断，如果查询到有值，查询username，没有值查询所有，又臭又长 -->
+      <sql id="queryWhereId">
+          <where>
+            <if test="username!=null and username!=''">
+               username like concat("%",#{username},"%")
+            </if>
+          </where>
+    </sql>
+    
+    <!-- 在映射文件中添加id为getRowCount元素，按条件统计记录总数 -->
+     <select id="doFindCount"
+            resultType="int">
+          select count(*) 
+          from sys_Logs
+          <include refid="queryWhereId"/>
+    </select>
+    
+    <!-- 根据用户名字，当前页码数量，页面大小，查询页面中
+		日志记录详细信息 -->
+    
+     <select id="doFindSysLogs" resultType="com.sb.sys.entity.SysLog">
+         select *
+         from sys_Logs
+         <include refid="queryWhereId"/>
+order by createdTime desc
+         limit #{startIndex},#{pageSize}    
+</select>
+
+<delete id="deleteObjects" >
+  delete from sys_Logs
+       where id in 
+       <foreach collection="ids"
+                open="("
+                close=")"
+                separator=","
+                item="id">
+               #{id} 
+        </foreach>
+</delete>
+
+<insert id="insertObject">
+	insert into sys_logs(username,operation,
+method,params,
+time,ip,
+createdTime)value(#{username},#{operation},
+#{method},#{params},
+#{time},#{ip},
+#{createdTime});
+</insert>
+  
+</mapper>
