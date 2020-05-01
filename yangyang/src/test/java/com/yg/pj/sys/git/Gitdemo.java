@@ -1,4 +1,4 @@
-package com.yg.pj.sys.source;
+package com.yg.pj.sys.git;
 
 public class Gitdemo {
 	
