@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yg.pj.sys.dao.SysUserDao">
+
+<cache 
+	eviction="LRU"
+	flushInterval="600000"   
+	size="512"
+	readOnly="false" /> 
+	 <!-- 使用mybatis 二级缓存 -->  <!--刷新频率 -->
+
+
+	<!-- sql元素用于对共性进行提取 -->
+	<!-- 此共性是 对于数据筛选的条件是 根据用户名筛选数据 -->
+	<sql id="queryWhereId">
+		<where>
+			<if test="name!=null and name!=''">
+				name like concat("%",#{name},"%")
+			</if>
+		</where>
+	</sql>
+
+
+
+
+
+	<!-- 通过用户名查询当前记录数 getRowCount -->
+	<select id="getRowCount" resultType="int" >
+		select count(*)
+		from sys_users
+		<include refid="queryWhereId" />
+	</select>
+
+	<!-- Dao层 通过用户名 起始记录数 页面大小 查询当前页面 记录信息 findPageObjects -->
+
+
+	<select id="findPageObjects" resultMap="sysUserDeptVo">
+		select *
+		from sys_users
+		<include refid="queryWhereId" />
+		order by createdTime desc
+		limit #{startIndex},#{pageSize}
+	</select>
+
+	<!-- 定义查询结果映射元素 -->
+
+	<resultMap type="com.yg.pj.sys.common.vo.SysUserDeptVo"
+		id="sysUserDeptVo">
+		<!-- 一般应用于many2one或one2one做关联查询 在当前应用是基于deptId查询部门信息并将其 存储到SysUserDeptVo对象的sysDept属性中。 -->
+		<association property="sysDept" column="deptId"
+			select="com.yg.pj.sys.dao.SysDeptDao.findById">
+		</association>
+	</resultMap>
+
+
+	<!-- 在页面中 用户通过用户id 状态码 修改用户状态 -->
+	<update id="validById" >
+		update sys_users
+		set valid =#{valid},modifiedUser =#{modifiedUser}
+		where id=#{id};
+	</update>
+
+	<!-- insert -->
+	<insert id="insert"  parameterType="com.yg.pj.sys.entity.SysUser"
+		useGeneratedKeys="true" keyProperty="id" >
+		insert into sys_users
+		(username,password,
+		salt,email,
+		mobile,valid,deptId,
+		createdTime,modifiedTime,
+		createdUser,modifiedUser)
+		values(#{username},#{password},
+		#{salt},#{email},
+		#{mobile},#{valid},#{deptId},
+		#{createdTime},#{modifiedTime},
+		#{createdUser},#{modifiedUser});
+	</insert>
+
+
+	<select id="findObjectById" resultMap="sysUserDeptVo">
+		select * from sys_users where id=#{id};
+	</select>
+
+
+	<update id="updateObject"
+		parameterType="com.yg.pj.sys.entity.SysUser">
+		update sys_users set
+		username=#{username},email=#{email},
+		mobile=#{mobile},deptId=#{deptId},
+		modifiedTime=now(),modifiedUser=#{modifiedUser}
+		where id=#{id};
+	</update>
+
+<!-- updateNewMd5Psd -->
+	<update id="updateNewMd5Psd">
+		update sys_users set
+		password =#{password},salt =#{salt},
+		modifiedUser=#{modifiedUser},modifiedTime=now()
+		where id=#{id};
+	</update>
+
+
+
+	<!-- 根据用户名查询用户信息 -->
+	<select id="findUserByUserName"
+		resultType="com.yg.pj.sys.entity.SysUser">
+		select * from sys_users
+		where username=#{username};
+	</select>
+
+</mapper>

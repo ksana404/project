@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yg.pj.sys.dao.SysRoleMenuDao">
+
+<cache 
+	eviction="LRU"
+	flushInterval="600000"   
+	size="512"
+	readOnly="false" />  <!-- 使用mybatis 二级缓存 -->  <!--刷新频率  -->
+	
+
+	<!-- 添加基于菜单id删除关系数据的元素 -->
+	<delete id="deleteObjectsByMenuId" parameterType="int">
+		delete from sys_role_menus
+		where menu_id=#{menuId}
+	</delete>
+
+
+
+
+	<!-- 删除角色-菜单关系 直接根据角色ID删除 -->
+	<delete id="deleteObjectsByRoleId">
+		delete from sys_role_menus
+		where role_id=#{id};
+	</delete>
+	
+	
+
+	<!--  保存角色 菜单 关系数据 roleId menuId -->
+	<insert id="insert">
+	insert into sys_role_menus
+	(role_id,menu_id) 
+	values
+	<foreach collection="menuIds" separator="," item="item">
+	(#{roleId},#{item})
+	</foreach>
+	</insert>
+	
+	<!-- 通过角色id 查询角色-菜单关系信息 菜单id  -->
+	<select id="findMenuIdByRoleId" resultType="int">
+	select menu_id from sys_role_menus where role_id=#{id};
+	</select>
+	
+
+<!--  根据角色id 修改角色-菜单 信息
+	updateByRoleId
+	int updateByRoleId(Integer roleId, List<Integer> menuIds);
+	不是从对象中取值 所以不需要 parameterType
+	-->
+	<update id="updateByRoleId" >
+	
+	update sys_role_menus 
+set menu_id=
+<foreach collection="menuIds" separator="," item="item">
+	(#{item})
+	</foreach>
+
+where role_id=#{roleId};
+	</update>
+
+
+	
+	
+	<!-- 基于角色id 获取菜单id(sys_role_menus) -->
+	<!--  Integer[] findMenuIdsByRoleId(Integer[] roleIds);
+	<select id="findMenuIdsByRoleId" resultType="int" parameterType="int">
+	SELECT menu_id FROM sys_role_menus where role_id in
+	    <foreach collection="roleIds"
+                  open="("
+                  close=")"
+                  separator=","
+                  item="item">
+               #{item}
+         </foreach>
+	</select>
+	
+	
+	 -->
+	<select id="findMenuIdsByRoleIds"
+         resultType="int" parameterType="int">
+         select menu_id
+         from sys_role_menus
+         where role_id in 
+         <foreach collection="roleIds"
+                  open="("
+                  close=")"
+                  separator=","
+                  item="item">
+               #{item}
+         </foreach>
+</select>
+	
+	
+	
+	
+	
+	
+
+</mapper>

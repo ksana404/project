@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yg.pj.sys.dao.SysDeptDao">
+
+<cache 
+	eviction="LRU"
+	flushInterval="600000"   
+	size="512"
+	readOnly="false" />  <!-- 使用mybatis 二级缓存 -->  <!--刷新频率  -->
+	<!-- sql元素用于对共性进行提取 -->
+	<!-- 此共性是 对于数据筛选的条件是 根据用户名筛选数据 -->
+	
+	<!-- 通过部门id 查询部门详情信息 -->
+	<select id="findById" resultType="com.yg.pj.sys.entity.SysDept">
+	select * from sys_depts where id=#{id};
+	</select>
+
+<!-- -->
+	<select id="findZtreeMenuNodes"
+		resultType="com.yg.pj.sys.common.vo.Node">
+		select id,name,parentId
+		from sys_depts;
+	</select>
+
+
+
+</mapper>

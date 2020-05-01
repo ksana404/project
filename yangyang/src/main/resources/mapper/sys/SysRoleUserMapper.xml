@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yg.pj.sys.dao.SysRoleUserDao">
+
+<cache 
+	eviction="LRU"
+	flushInterval="600000"   
+	size="512"
+	readOnly="false" />  <!-- 使用mybatis 二级缓存 -->  <!--刷新频率  -->
+	
+	<!-- sql元素用于对共性进行提取 -->
+	<!-- 此共性是 对于数据筛选的条件是 根据用户名筛选数据 -->
+
+
+
+	<!-- 删除角色-用户关系 直接根据角色ID删除 -->
+	<delete id="deleteObjectsByRoleId">
+		delete from sys_user_roles
+		where role_id=#{id};
+	</delete>
+
+
+
+<!-- insert  一个用户 根据自己单独的id 添加多个角色id 形成一对多关系-->
+<insert id="insert">
+insert into sys_user_roles
+(user_id,role_id)
+values 
+<foreach collection="roleIds" separator="," item="roleId">
+	(#{userId},#{roleId})
+	</foreach>
+</insert>
+
+<!-- 
+int insert(Integer userId, Integer[] roleIds);
+ -->
+
+
+	
+
+
+ <!--  Integer[] findRoleIdsByUserId(Integer id); -->
+ <!--  基于用户id获取用户拥有的角色ID(sys_user_roles)-->
+ <select id="findRoleIdsByUserId" resultType="int">
+ SELECT role_id FROM sys_user_roles where user_id =#{id}
+ 
+ 
+ </select>
+
+</mapper>

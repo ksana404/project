@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yg.pj.sys.dao.SysMenuDao">
+
+<cache 
+	eviction="LRU"
+	flushInterval="600000"   
+	size="512"
+	readOnly="false" />  <!-- 使用mybatis 二级缓存 -->  <!--刷新频率  -->
+	
+	<!-- sql元素用于对共性进行提取 -->
+	<!-- 此共性是 对于数据筛选的条件是 根据用户名筛选数据 -->
+
+	<!-- 分页查询 -->
+	<select id="findObjects" resultType="map"  >
+		<!-- 方案1 select c.*,p.name parentName from sys_menus c left join sys_menus 
+			p on c.parentId=p.id -->
+		<!-- 方案2 -->
+		select c.*,(
+		select p.name
+		from sys_menus p
+		where c.parentId=p.id
+		) parentName
+		from sys_menus c;
+
+	</select>
+
+	<!-- 添加基于id统计子菜单数量的元素 -->
+	<select id="getChildCount" parameterType="int" resultType="int" >
+		select count(*)
+		from sys_menus
+		where parentId=#{id}
+	</select>
+
+
+	<!-- 添加delete元素,基于带单id删除菜单自身记录信息 -->
+	<delete id="deleteObject" >
+		delete from sys_menus
+		where id =#{id}
+
+	</delete>
+
+	<!-- -->
+	<select id="findZtreeMenuNodes"
+		resultType="com.yg.pj.sys.common.vo.Node">
+		select id,name,parentId
+		from sys_menus
+	</select>
+
+	<insert id="insertObject"
+		parameterType="com.yg.pj.sys.entity.SysMenu"
+		flushCache="true" >  <!-- 执行插入操作 默认刷新缓存 -->
+		insert into sys_menus
+		(name,url,type,sort,note,parentId,permission,
+		createdTime,modifiedTime,createdUser,modifiedUser)
+		values
+		(#{name},#{url},#{type},#{sort},#{note},#{parentId},
+		#{permission},now(),now(),#{createdUser},#{modifiedUser})
+	</insert>
+	
+	
+	<update id="updateObject"
+            parameterType="com.yg.pj.sys.entity.SysMenu">
+         update sys_menus
+         set
+           name=#{name},
+           type=#{type},
+           sort=#{sort},
+           url=#{url},
+           parentId=#{parentId},
+           permission=#{permission},
+           modifiedUser=#{modifiedUser},
+           modifiedTime=now()
+        where id=#{id}
+    </update>
+    
+    
+    
+    <!-- 通过菜单id 查询授权信息 -->
+	<!-- String findPermission(Integer[] menusIds); -->
+	<!-- collection="menusIds"   #{item} -->
+	<select id="findPermission" resultType="string" parameterType="int">
+	SELECT permission FROM sys_menus where id=
+	<choose>
+	<when test="menusIds !=null and menusIds.size >0">
+		<foreach collection="menusIds" separator="or" item="menusId">#{menusId}</foreach>
+		<!-- 要查询所有的menusIds的值 使用 and 连接 -->
+	</when>
+	<otherwise>
+	-1
+	</otherwise>
+	
+	</choose>
+	
+	</select>
+	
+
+</mapper>

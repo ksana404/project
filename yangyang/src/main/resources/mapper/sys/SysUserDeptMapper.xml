@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yg.pj.sys.dao.SysUserDeptDao">
+	<!-- sql元素用于对共性进行提取 -->
+	<!-- 此共性是 对于数据筛选的条件是 根据用户名筛选数据 -->
+	
+	
+
+</mapper>

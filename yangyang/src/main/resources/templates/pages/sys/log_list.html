@@ -1,0 +1,346 @@
+<div class="row">
+	<div class="col-xs-12">
+		<div class="box">
+			<div class="box-header">
+				<h3 class="box-title">日志管理</h3>
+
+				<div class="box-tools">
+					<div class="input-group input-group-sm" style="width: 350px;">
+						<input type="text" name="table_search" id="searchNameId"
+							class="form-control pull-right" placeholder="用户名">
+
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default btn-search">
+                                <i class="fa fa-search"></i>
+							</button>
+							<button type="button" class="btn btn-default btn-delete">删除</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.box-header -->
+			<div class="box-body table-responsive no-padding">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+						    <th><input type="checkbox" id="checkAll">全选</th>
+							<th>用户名</th>
+							<th>操作</th>
+							<th>请求方法</th>
+							<th>请求参数</th>
+							<th>IP</th>
+							<th>执行时长</th>
+							<th>创建时间</th>
+						</tr>
+					</thead>
+					<tbody id="tbodyId">
+					    <tr>
+					       <td colspan="8">数据正在加载中...</td>
+					    </tr>
+					</tbody>
+				</table>
+			</div>
+			<div id="pageId" class="box-footer clearfix">
+			
+			</div>
+			<!-- /.box-body -->
+		</div>
+		<!-- /.box -->
+	</div>
+</div>
+
+
+<!--  //ajax/syslog-ajax.js  -->
+<script type="text/javascript">
+
+
+
+
+   $(function(){
+	   //const 关键字用于定义常量,常量不允许多次赋值
+	   const pageUrl="doPageUI";
+	   //在pageId对应的位置异步加载pageUrl对应的资源
+	   $("#pageId").load(pageUrl,doGetObjects);
+	   // 页面加载到pageId，发送url："doPageUI"请求 进行分页页面跳转，进而执行doGetObjects方法
+//$(selector).load(url,data,function(response,status,xhr))
+
+ // doGetObjects() 表示直接调用
+   //在搜索框中，根据用户名查询用户日志操作
+   $(".input-group").on("click",".btn-search",doQueryObjects);
+   // 在类input-group上加上btn-search部位的点击事件，执行方法doQueryObjects
+  
+   //页面加载完成以后，在删除按钮上进行点击事件注册
+   //在搜索框中，根据用户名勾选项 删除用户日志信息
+    $(".input-group").on("click",".btn-delete",doDeleteObjects);
+   
+   
+   })
+   
+   //在搜索框中，根据用户名查询用户日志操作 ！！定义
+   function doQueryObjects(){
+	 //为什么要在此位置初始化pageCurrent的值为1?
+	   //数据查询时页码的初始位置也应该是第一页
+	    $("#pageId").data("pageCurrent",1);
+	  //为什么要调用doGetObjects函数？
+	   //重用js代码，简化jS代码编写。
+	  doGetObjects();
+   }
+   
+ //在搜索框中，根据用户名勾选项 删除用户日志信息   ！！定义
+ 
+    //------------------>>>>
+ 
+ function doDeleteObjects(){
+	 //1.获取选中的id值
+	 var ids =doGetCheckedIds();
+	 if(ids==0){
+		 alert("至少选择一个呀，小家伙？？");
+		 return;
+	 }
+	 //2.发异步请求执行删除操作 URL 参数  请求方法定义
+	 var url ="log/doDeleteObjects";
+	 var params={"ids":ids.toString()};
+	 console.log(params);
+	 //post请求  URL 参数 结果处理
+	 $.post(url,params,function (result){
+		 console.log("result:"+result)
+		 if(result.state==1){
+			 alert(result.message);
+			 //成功删除  刷新页面
+			// doGetObjects();
+			
+		 }else{
+			 alert(result.message);
+		 }
+		 
+		 doRefreshPage();
+	 });
+	 
+	 
+ }
+ 
+ //定义获取id的函数 doGetCheckedIds
+ 
+ //第三步：定义获取用户选中的记录id的函数。关键代码如下：
+ //他需要获取选中的id值  还需要返回这些值
+ function doGetCheckedIds(){
+	 //debugger
+	   //定义一个数组,用于存储选中的checkbox的id值
+	 //new Array();
+	 var idArray=[];
+	   //获取tbody中所有类型为checkbox的input元素
+	$("#tbodyId input[type=checkbox]")
+	   .each(function (){ //发现checkbox则回调函数//迭代这些元素，每发现一个元素都会执行如下回调函数
+		   if($(this).prop("checked")){//假如此元素的checked属性的值为true
+			   idArray.push($(this).val)}
+	   });
+			   //调用数组对象的push方法将选中对象的值存储到数组
+	 return idArray;
+ }
+ 
+ //老师的模板doGetCheckedIds   TTTTTTTTTT
+ function doGetCheckedIdsT(){
+	 //debugger
+	   //定义一个数组,用于存储选中的checkbox的id值
+	   var array=[];//new Array();
+	   //获取tbody中所有类型为checkbox的input元素
+	   $("#tbodyId input[type=checkbox]").
+	   //迭代这些元素，每发现一个元素都会执行如下回调函数
+	   each(function(){
+		   //假如此元素的checked属性的值为true
+		   if($(this).prop("checked")){
+			   //调用数组对象的push方法将选中对象的值存储到数组
+			   array.push($(this).val());
+		   }
+	   });
+	   return array;
+ }
+ 
+ //第四步：Thead中全选元素的状态影响tbody中checkbox对象状态。代码如下：
+   function doChangeTBodyCheckBoxState(){
+	   //1.获取当前点击对象的checked属性的值
+	   var flag=$(this).prop("checked");//true or false
+	   //2.将tbody中所有checkbox元素的值都修改为flag对应的值。
+	   //第一种方案
+	   /* $("#tbodyId input[name='cItem']")
+	   .each(function(){
+		   $(this).prop("checked",flag);
+	   }); */
+	   //第二种方案
+	   $("#tbodyId input[type='checkbox']")
+	   .prop("checked",flag);
+   }
+   //第五步：Tbody中checkbox的状态影响thead中全选元素的状态。代码如下：
+   function doChangeTHeadCheckBoxState(){
+	  //1.设定默认状态值
+	  var flag=true;
+	  //2.迭代所有tbody中的checkbox值并进行与操作
+	  $("#tbodyId input[name='cItem']")
+	  .each(function(){
+		  flag=flag&$(this).prop("checked")
+	  });
+	  //3.修改全选元素checkbox的值为flag
+	  $("#checkAll").prop("checked",flag);
+   }
+ 
+   //第六步：完善业务刷新方法，当在最后一页执行删除操作时，基于全选按钮状态及当前页码值，刷新页面。关键代码如下:
+	   
+	   function doRefreshPage(){
+	    	 var pageCount=$("#pageId").data("pageCount");
+	    	 var pageCurrent=$("#pageId").data("pageCurrent");
+	    	 var checked=$("#checkAll").prop("checked");
+	    	 if(pageCurrent==pageCount&&checked&&pageCurrent>1){
+	    		 pageCurrent--;
+	    		 $("#pageId").data("pageCurrent",pageCurrent);
+	    	 }
+	         doGetObjects();
+	   }
+ 
+   
+   function doGetObjects(){
+	  
+	   
+	   //###################################################  0402   ！！！！！！！！！！！ 
+	//$(selector).getJSON(url,data,success(data,status,xhr))
+	   //1.请求的url
+	   // $("#pageId").data("pageCount",pageObject.pageCount);
+	  var params ={"pageCurrent":1};  //暂时参数中还没有加上username
+	   var pageCurrent= $("#pageId").data("pageCurrent");
+	   //从页面中查找id为pageId的容器，从中提取pageCurrent的值，给到变量var pageCurrent
+	   
+	   if(pageCurrent)params.pageCurrent=pageCurrent;
+	  /**
+	   if(pageCurrent > 1){
+		 //  params.pageCurrent=pageCurrent;
+		  params ={"pageCurrent":pageCurrent};
+	   }
+	**/ 
+	
+	   var username =$("#searchNameId").val();
+	   
+	   //如下语句的含义是什么？动态在js对象中添加key/value,
+		   if(username) params.username=username;//查询时需要
+		   //当username值不为空时  表示向params对象添加一个键值对，key username,值是username
+		   console.log("params:"+params);
+		   //params 是url请求的一个参数
+//使用这个格式，系统默认会转化成json格式 "pageCurrent=1" 
+	   
+	   //2.请求参数
+	   var url ="log/doFindPageObjects"
+	   //3,发送异步请求并处理结果
+	   //getJSON 为ajax中的一个ajax函数
+	   //getJSON基于ajax的xhr对象向服务端发起异步请求
+	   //getJSON函数将服务端的函数响应结果转化为JSON格式js对象
+	   //getJSON函数最后会将响应结果传递给callback函数
+	  $.getJSON(url,params,doHandlerResponseResult);
+	
+	//$.getJSON(url,params,function (result){ //这是一个方法里面调用匿名函数
+		//doHandlerResponseResult(result); //result为返回值
+		//具体来说是getJSON中执行请求url后得到的result为返回值
+	//});
+	
+	
+	   function doHandlerResponseResult(result){//callback
+		   //result d对应的是服务端返回的JsonResult
+		   if(result.state==1){ //ok
+			   //0,正确之后，我们需要呈现日志记录   
+			   //1.初始化页面日志信息 ()内是List<SysLog> records
+			  doSetTableBodyRows(result.data.records);
+			   //2.初始化页面分页信息
+			  // doSetTableBodyPages(result.data);
+			   //因为page.html页面已经加载，所以上面的doSetPagination方法也被定义
+			   //了,在这个页面容器中是可以被调用的
+			   doSetPagination(result.data);
+			   //3.
+		   }else{//err
+			   alert(result.message);
+		   }
+		   
+  //===================================================
+	 //给页面添加页面信息     给页面添加日志信息
+	  /***
+		   //1.初始化页面日志信息  doSetTableBodyRows
+		   var records;
+		   function doSetTableBodyRows(records){
+			   
+		   }
+		   
+		   
+		   
+		   //2.初始化页面分页信息  doSetTableBodyPages
+		   var data;
+		   function doSetTableBodyPages(data){}
+		   
+		   **/
+		   
+		   //--------------------------------------------------------
+	/////////==========下面不是ajax,只是一些共性方法的提取=========/////////////////////////
+			//处理响应结果 表单追加方法
+			//1.初始化页面日志信息 ()内是List<SysLog> records
+			//  doSetTableBodyRows(result.data.records);
+			//方法的加载是随着页面的加载而进行的
+			function  doSetTableBodyRows(records){
+				  //1.获取tbody对象，并清空对象
+				  var tBody =$("#tbodyId");  //$学习
+				  tBody.empty();
+				  //2.迭代records记录，并将其内容追加到tbody
+				  // records 哪里过来的？
+				  /***
+				  PageObject<SysLog> pageObject : 
+				  {pageCurrent:vaule,
+					  pageSize:vaule,
+					  rowCount:vaule,
+					  pageCount:vaule,
+					  records:vaule,
+					  }
+				  
+				  records: List<SysLog> records
+				  */
+				  //2.迭代records记录，并将其内容追加到tbody
+				  //console.log(11);
+				  console.log("records:"+records);
+				  for(var i in records){
+					  ////2.1 构建tr对象
+					 var tr=$("<tr></tr>");
+					  ////2.12构建tds对象
+					 console.log("records[i]:"+records[i]);
+					  var tds=doCreateTds(records[i]);
+					  //  //2.3 将tds追加到tr中
+					  tr.append(tds);
+					  //  //2.4 将tr追加到tbody中
+					  tBody.append(tr);
+					  //
+				  }
+				  
+				  //创建每行中的td元素，并填充具体业务数据
+				  function doCreateTds(data){
+					  var tds="<td><input type='checkbox' class='cBox' name='cItem' value='"+data.id+"'></td>"+
+					   	 "<td>"+data.username+"</td>"+
+					     "<td>"+data.operation+"</td>"+
+					     "<td>"+data.method+"</td>"+
+					     "<td>"+data.params+"</td>"+
+					     "<td>"+data.ip+"</td>"+
+					     "<td>"+data.time+"</td>"+
+					     "<td>"+new Date(data.createdTime).toLocaleString()+"</td>";	   
+			return tds;
+				  }
+				  
+			}
+			
+/////////==========分页信息查询=========/////////////////////////		
+	/**
+	日志信息列表初始化完成以后初始化分页数据（调用setPagination函数），
+	然后再点击上一页，下一页等操作时，更新页码值，执行基于当前页码值的查询。
+	*/		
+		
+		console.log(result);
+	  // alert("处理完毕！");
+	}
+   }
+</script>
+
+
+
+
+
+

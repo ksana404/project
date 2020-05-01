@@ -1,0 +1,67 @@
+-----------jQuery 事件 - load() 方法
+https://www.runoob.com/jquery/ajax-load.html
+一定要带有url，要执行，执行
+
+定义和用法
+当指定的元素（及子元素）已加载时，会发生 load() 事件。
+
+该事件适用于任何带有 URL 的元素（比如图像、脚本、框架、内联框架）。
+
+根据不同的浏览器（Firefox 和 IE），如果图像已被缓存，则也许不会触发 load 事件。
+
+注释：还存在一个名为 load() 的 jQuery Ajax 方法，根据不同的参数而定。
+
+语法
+$(selector).load(function)
+------------------------------------------------------------------------------------
+
+
+---------------jQuery getJSON() 方法
+https://www.runoob.com/jquery/ajax-getjson.html
+定义和用法
+getJSON() 方法使用 AJAX 的 HTTP GET 请求获取 JSON 数据。
+
+语法
+$(selector).getJSON(url,data,success(data,status,xhr))
+
+参数	描述
+url	必需。规定将请求发送到哪个 URL。
+data	可选。规定发送到服务器的数据。
+success(data,status,xhr)	可选。规定当请求成功时运行的函数。
+额外的参数：
+data - 包含从服务器返回的数据
+status - 包含请求的状态（"success"、"notmodified"、"error"、"timeout"、"parsererror"）
+xhr - 包含 XMLHttpRequest 对象
+**************************************************************
+实例
+使用 Ajax 请求获取 JSON 数据，并输出结果：
+
+$(document).ready(function(){
+    $("button").click(function(){
+        $.getJSON("demo_ajax_json.js",function(result){
+            $.each(result, function(i, field){
+                $("div").append(field + " ");
+            });
+        });
+    });
+});
+************************************************
+------------------------------------------------------------------------------
+
+
+
+------ //$学习 //$学习 //$学习 //$学习 //$学习 //$学习
+
+------js端解决问题的方法
+1） debugger  console.log()  排除法
+
+----------------
+ if(username) params.username=username;//查询时需要
+		   //表示向params对象添加一个键值对，key username,值是username
+		   
+		   ---------
+if(param)object.value=param;
+如果param不为空，那么给object添加属性名value的属性，同时添加值param；
+		   
+		   
+		   

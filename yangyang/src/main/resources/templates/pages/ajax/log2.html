@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<div>
+    <h1>Log Manage Page</h1>
+</div>
+<div>
+    <form>
+       <input type="text" id="nameId">
+       <button id="searchId" type="button">查询</button>
+    </form>
+    <br/>
+  
+    
+    
+    <table class="table table-hover">
+					<thead>
+						<tr>
+						    <th><input type="checkbox" id="checkAll">全选</th>
+							<th>用户名</th>
+							<th>操作</th>
+							<th>请求方法</th>
+							<th>请求参数</th>
+							<th>IP</th>
+							<th>执行时长</th>
+						</tr>
+					</thead>
+					<tbody id="tbodyId">
+					    <tr>
+					       <td colspan="7">数据正在加载中...</td>
+					    </tr>
+					</tbody>
+				</table>
+				
+				
+</div>
+<script type="text/javascript" src="/bower_components/models/ajaxfk.js"></script>
+<script type="text/javascript">
+/////////==========下面不是ajax,只是一些共性方法的提取=========/////////////////////////
+//处理响应结果 表单追加方法
+//1.初始化页面日志信息 ()内是List<SysLog> records
+//  doSetTableBodyRows(result.data.records);
+
+function doSetTableBodyRows(result){
+	console.log(result);
+	//1.获得tbody 对象，清空原有内容
+	var tBody = document.getElementById("tbodyId");
+	tBody.innerHTML="";
+	  //2.迭代result记录,并将记录呈现在tbody位置
+	  for(var i=0;i<result.length;i++){
+		//2.1构建tr对象
+	var tr =document.createElement("tr");
+	 //2.2构建td对象,并追加到tr中
+	 doCreatedTds(tr,result[i]);
+	 //2.3将tr对象追加到tbody中
+	 tBody.appendChild(tr);
+		  
+	  }  
+	
+}
+
+
+//创建 td tr 填充数据
+function doCreatedTds(tr,row){
+
+	var td =document.createElement("td"); 	//1构建td对象
+	td.innerText = row.id; 	//获取信息
+	tr.appendChild(td); //追加
+	
+	var td =document.createElement("td"); 	//1构建td对象
+	td.innerText = row.username; 	//获取信息   用户名
+	tr.appendChild(td); //追加
+	
+	var td =document.createElement("td"); 	//1构建td对象
+	td.innerText = row.operation; 	//获取信息   操作
+	tr.appendChild(td); //追加
+	
+	var td =document.createElement("td"); 	//1构建td对象
+	td.innerText = row.method; 	//获取信息 请求方法
+	tr.appendChild(td); //追加
+	
+	var td =document.createElement("td"); 	//1构建td对象
+	td.innerText = row.params; 	//获取信息  请求参数
+	tr.appendChild(td); //追加
+	
+	var td =document.createElement("td"); 	//1构建td对象
+	td.innerText = row.ip; 	//获取信息  IP
+	tr.appendChild(td); //追加
+	
+	var td =document.createElement("td"); 	//1构建td对象
+	td.innerText = row.createdTime; 	//获取信息   执行时长
+	tr.appendChild(td); //追加
+	
+}
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+

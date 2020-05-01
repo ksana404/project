@@ -1,0 +1,103 @@
+<ul class="pagination pagination-sm no-margin pull-right">
+    <li><a class="first">首页</a></li>
+	<li><a class="pre">上一页</a></li>
+	<li><a class="next">下一页</a></li>
+	<li><a class="last">尾页</a></li>
+	<li><a class="rowCount">总记录数(0)</a></li>
+	<li><a class="pageCount">总页数(0)</a></li>
+	<li><a class="pageCurrent">当前页(1)</a></li>
+</ul>
+<script type="text/javascript">
+$(function(){
+	  //在pageId对象上注册click事件
+	  //当点击pageId对象内部的first,pre等元素时,
+	  //执行doJumpToPage事件处理函数.
+	  $("#pageId")
+	  .on("click",".first,.pre,.next,.last",doJumpToPage)
+});
+
+
+function doJumpToPage(){
+	//debugger
+	  //1.获取点击对象的class属性值
+	  //prop函数为jquery中获取对象属性值的一个函数
+	  //prop函数语法prop(属性名,[属性值])
+	  var cls=$(this).prop("class");
+	  //2.基于class属性值修改当前页码值
+	  //2.1获取当前页码值,总页数
+	  var pageCurrent= $("#pageId").data("pageCurrent");
+	  var pageCount=$("#pageId").data("pageCount");
+	 
+    //2.2修改页码值
+    if(cls=="first"){
+  	  pageCurrent=1;
+    }else if(cls=="next"&&pageCurrent<pageCount){
+  	  pageCurrent++;
+    }else if(cls=="pre"&&pageCurrent>1){
+  	  pageCurrent--;
+    }else if(cls=="last"){
+  	  pageCurrent=pageCount;
+    }else{return;}
+	  //3.基于新的页码值执行查询操作.  存储当前页码值
+	  //data函数 是Jquery函数
+	  $("#pageId").data("pageCurrent",pageCurrent);
+	  doGetObjects();
+}
+
+//初始化分页信息
+function doInitPagination(){
+	//1.初始化总记录数
+	 $(".rowCount").html("总记录数(0)")
+	//2.初始化总页数
+	 $(".pageCount").html("总页数(0)")
+	//3.初始化当前页码值
+	 $(".pageCurrent").html("当前页(1)")
+}
+
+//第一步：定义doSetPagination方法(实现分页数据初始化)
+function doSetPagination(pageObject){
+	console.log("pageObject:"+pageObject)
+	//1.始化数据
+	$(".rowCount").html("总记录数("+pageObject.rowCount+")")
+	$(".pageCount").html("总页数("+pageObject.pageCount+")")
+	$(".pageCurrent").html("当前页("+pageObject.pageCurrent+")")
+	//4存储当前页码值
+	 //data函数为juqery中的数据绑定函数
+	  //data函数语法data(key,[value])
+	  $("#pageId")
+	  .data("pageCurrent",pageObject.pageCurrent);
+	  $("#pageId")
+	  .data("pageCount",pageObject.pageCount);
+}
+
+//2.绑定数据(为后续对此数据的使用提供服务)
+
+//第二步：分页页面page.html中注册点击事件。代码如下：
+//事件注册
+
+//第三步：定义doJumpToPage方法(通过此方法实现当前数据查询)
+//1.获取点击对象的class值
+//2.基于点击的对象执行pageCurrent值的修改
+//2.1获取pageCurrent,pageCount的当前值
+  //2.2修改pageCurrent的值
+    //2.2修改pageCurrent的值
+     //4.基于新的pageCurrent的值进行当前页数据查询
+     
+//修改分页查询方法:(看红色框部分)
+//debugger;//断点调试
+//1.定义url和参数
+//? 请问data函数的含义是什么？(从指定元素上获取绑定的数据)
+//此数据会在何时进行绑定？(setPagination,doQueryObjects)
+//为什么要执行如下语句的判定，然后初始化pageCurrent的值为1
+//pageCurrent参数在没有赋值的情况下，默认初始值应该为1.
+ //2.发起异步请求
+//请问如下ajax请求的回调函数参数名可以是任意吗？可以,必须符合标识符的规范
+//JsonResult->PageObject->List<SysLogs>+...
+   //请问result是一个字符串还是json格式的js对象？对象
+
+
+
+<!--
+
+//-->
+</script>

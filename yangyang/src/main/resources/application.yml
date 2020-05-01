@@ -1,0 +1,61 @@
+#调试模式  只能 在开发阶段使用   可以查看整个框架各种模块 类生效情况
+#debug: true
+
+#服务器配置 server
+server:
+  port: 9099
+  
+  servlet:
+    context-path: /
+  tomcat:
+    max-threads: 1000
+    min-spare-threads: 8
+    accesslog:
+      prefix: tomcat
+    uri-encoding: UTF-8
+    ## 设置get请求，post请求是设置请求头
+
+
+#框架配置
+spring:
+  datasource:
+    url: jdbc:mysql:///yangsys?serverTimezone=GMT%2B8
+    username: root
+    password: root
+  thymeleaf: 
+    prefix: classpath:/templates/pages/
+    cache: false
+    ## 启用jdk代理
+  aop:
+    proxy-target-class: false
+ 
+         
+    
+    
+#mybatis
+mybatis:
+  configuration:
+    default-statement-timeout: 30
+    map-underscore-to-camel-case: true
+  mapper-locations:
+  - classpath:/mapper/*/*.xml
+  
+#log
+logging:
+  level:
+    com.yg: debug
+    
+#page
+yang:
+  page:
+    pageSize: 12
+
+#async-thread-pool
+async-thread-poolp:
+  corePoolSize: 8
+  maxPoolSize: 200
+  keepAliveSeconds: 5
+  queueCapacity: 10
+       
+
+    
